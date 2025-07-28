@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Smart Auto Tab Grouper</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 10px;
+      width: 300px;
+    }
+
+    input, select {
+      margin-bottom: 8px;
+      width: 100%;
+      padding: 6px;
+    }
+
+    button {
+      width: 100%;
+      padding: 8px;
+      background-color: #1976d2;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .rule {
+      margin-bottom: 12px;
+    }
+
+    .rule input {
+      width: 45%;
+      margin-right: 5%;
+    }
+
+    .rule select {
+      width: 45%;
+    }
+
+    .rule-row {
+      display: flex;
+      gap: 5px;
+      margin-bottom: 8px;
+    }
+
+    .rule-row input {
+      flex: 1;
+    }
+
+    .rule-row select {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <h3>Domain Group Rules</h3>
+  <div id="rulesContainer"></div>
+
+  <button id="addRule">➕ Add Rule</button>
+  <button id="saveRules">💾 Save Rules</button>
+  <button id="groupNow">📂 Group Tabs</button>
+
+  <script src="popup.js"></script>
+</body>
+</html>
