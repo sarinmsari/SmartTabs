@@ -29,9 +29,14 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 
         // If a previous tab was active, mark its group as inactive
         if (currentActiveTabId !== null && currentActiveTabId !== tabId) {
-            const previousTab = await chrome.tabs.get(currentActiveTabId);
-            if (previousTab.groupId !== -1 && previousTab.groupId !== newTab.groupId) {
-                groupActivityMap[previousTab.groupId] = Date.now(); // now it goes idle
+            try{
+                const previousTab = await chrome.tabs.get(currentActiveTabId);
+                if (previousTab.groupId !== -1 && previousTab.groupId !== newTab.groupId) {
+                    groupActivityMap[previousTab.groupId] = Date.now(); // now it goes idle
+                }
+            }catch(err){
+                // Previous tab might have been closed — ignore safely
+                console.warn(`Previous tab ${currentActiveTabId} is not accessible`, err);
             }
         }
 
