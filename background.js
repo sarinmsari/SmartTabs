@@ -8,33 +8,32 @@ const INTERVAL_TIME_MS = 1000 * 60; // 1 minutes
 // on extension initialization
 chrome.runtime.onInstalled.addListener(() => {
     console.log("✅ Smart Auto Tab Grouper installed");
-    /* const defaultRules = {
-        "facebook.com": { group: "Social", color: "blue" },
-        "twitter.com": { group: "Social", color: "blue" },
-        "youtube.com": { group: "Entertainment", color: "red" },
-        "github.com": { group: "Work", color: "green" }
-    };
-
-    chrome.storage.sync.get('rules', (result) => {
-        if (!result.rules) {
-            chrome.storage.sync.set({ rules: defaultRules });
-        }
-    }); */
+    
+    // Initialize storage with empty rules and available groups
+    /* chrome.storage.sync.set({ rules: {} });
+    chrome.storage.sync.set({ availableGroups: {} }); */
 });
 
 // track when user switches tabs
 chrome.tabs.onActivated.addListener(async ({ tabId }) => {
     try {
-        const newTab = await chrome.tabs.get(tabId);
+        let newTab;
+        try {
+            newTab = await chrome.tabs.get(tabId);
+        } catch (err) {
+            // Tab might have been closed before we could get it
+            console.warn(`Tab with id ${tabId} is not accessible`, err);
+            return;
+        }
 
         // If a previous tab was active, mark its group as inactive
         if (currentActiveTabId !== null && currentActiveTabId !== tabId) {
-            try{
+            try {
                 const previousTab = await chrome.tabs.get(currentActiveTabId);
                 if (previousTab.groupId !== -1 && previousTab.groupId !== newTab.groupId) {
                     groupActivityMap[previousTab.groupId] = Date.now(); // now it goes idle
                 }
-            }catch(err){
+            } catch (err) {
                 // Previous tab might have been closed — ignore safely
                 console.warn(`Previous tab ${currentActiveTabId} is not accessible`, err);
             }
@@ -44,7 +43,7 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
         currentActiveTabId = tabId;
         startGroupMonitorInterval();
     } catch (err) {
-        console.error('Failed to get tab info:', err);
+        console.error('Unexpected error in onActivated handler:', err);
     }
 });
 
@@ -127,45 +126,68 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
 function groupTabs(tab, groupTitle, groupColor = "grey") {
     if (!groupTitle) return;
 
-    if (groupMap[groupTitle]) {
-        chrome.tabs.group({
-            groupId: groupMap[groupTitle],
-            tabIds: [tab.id]
-        }, () => {
-            if (!chrome.runtime.lastError) {
-                groupActivityMap[groupMap[groupTitle]] = Date.now();
+    const existingGroupId = groupMap[groupTitle];
+
+    if (existingGroupId !== undefined) {
+        // First check if the group still exists
+        chrome.tabGroups.get(existingGroupId, (group) => {
+            if (chrome.runtime.lastError || !group) {
+                // Group doesn't exist anymore, create a new one
+                createNewGroup(tab, groupTitle, groupColor);
             } else {
-                console.error('Error adding tab to group:', chrome.runtime.lastError.message);
+                // Group exists, add tab to it
+                chrome.tabs.group({
+                    groupId: existingGroupId,
+                    tabIds: [tab.id]
+                }, () => {
+                    if (!chrome.runtime.lastError) {
+                        groupActivityMap[existingGroupId] = Date.now();
+                    } else {
+                        console.error('Error adding tab to group:', chrome.runtime.lastError.message);
+                    }
+                });
             }
         });
     } else {
-        chrome.tabs.group({ tabIds: [tab.id] }, (groupId) => {
-            if (chrome.runtime.lastError || groupId === chrome.tabs.TAB_ID_NONE) {
-                console.error('Error creating group:', chrome.runtime.lastError?.message || 'Unknown error');
-                return;
-            }
-
-            chrome.tabGroups.update(groupId, {
-                title: groupTitle,
-                color: groupColor
-            }, () => {
-                if (!chrome.runtime.lastError) {
-                    groupMap[groupTitle] = groupId;
-                    groupActivityMap[groupId] = Date.now();
-                    startGroupMonitorInterval();
-                } else {
-                    console.error('Error updating group:', chrome.runtime.lastError.message);
-                }
-            });
-        });
+        // Group not in map, create a new one
+        createNewGroup(tab, groupTitle, groupColor);
     }
 }
 
+function createNewGroup(tab, groupTitle, groupColor) {
+    chrome.tabs.group({ tabIds: [tab.id] }, (newGroupId) => {
+        if (chrome.runtime.lastError) {
+            console.error('Error creating new group:', chrome.runtime.lastError.message);
+            return;
+        }
+
+        chrome.tabGroups.update(newGroupId, {
+            title: groupTitle,
+            color: groupColor
+        }, () => {
+            if (!chrome.runtime.lastError) {
+                groupMap[groupTitle] = newGroupId;
+                groupActivityMap[newGroupId] = Date.now();
+
+                // Add group to available groups in storage
+                chrome.storage.sync.get('availableGroups', (data) => {
+                    const availableGroups = data.availableGroups || {};
+                    availableGroups[groupTitle] = { color: groupColor, groupId: newGroupId };
+                    chrome.storage.sync.set({ availableGroups });
+                    console.log(availableGroups);
+                });
+            } else {
+                console.error('Error updating group:', chrome.runtime.lastError.message);
+            }
+        });
+    });
+}
 
 // Triggers grouping based on stored rules
 function autoGroupTabs() {
   chrome.storage.sync.get('rules', (data) => {
     const rules = data.rules || {};
+    console.log('Auto grouping tabs with rules:', rules);
 
     chrome.tabs.query({}, (tabs) => {
       tabs.forEach(tab => {

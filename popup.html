@@ -6,12 +6,44 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h3>Domain Group Rules</h3>
-  <div id="rulesContainer"></div>
+  <div class="input-wrapper">
+    <label for="domainInput">Domain:</label>
+    <input type="text" id="domainInput" class="input-box" style="width: auto;" placeholder="URL pattern (e.g., *.example.com)">
+  </div>
 
-  <button id="addRule">➕ Add Rule</button>
-  <button id="saveRules">💾 Save Rules</button>
-  <button id="groupNow">📂 Group Tabs</button>
+  <div style="margin-top: 24px;">
+    <div class="group-select-wrapper">
+      <label for="groupSelect">Select group</label>
+      <select id="groupSelect" class="select-box" style="margin-top: 8px;">
+        <option value="create-group">Create new group</option>
+        <!-- Existing options will be dynamically populated -->
+      </select>
+    </div>
+
+    <div class="create-group-wrapper" style="margin-top: 24px;">
+      <h4 style="margin-bottom: 8px;">Create new group</h4>
+      <div class="create-group-input-wrapper">
+        <div>
+          <select id="groupColorSelect" class="select-box" style="width: 100px; border-color: #9E9E9E;">
+            <option value="grey">Grey</option>
+            <option value="blue">Blue</option>
+            <option value="red">Red</option>
+            <option value="yellow">Yellow</option>
+            <option value="green">Green</option>
+            <option value="pink">Pink</option>
+            <option value="purple">Purple</option>
+            <option value="cyan">Cyan</option>
+            <option value="orange">Orange</option>
+          </select>
+        </div>
+        <input type="text" id="newGroupInput" class="input-box" style="border-color: #9E9E9E;" placeholder="New group name">
+      </div>
+    </div>
+  </div>
+
+  <div class="save-wrapper" style="margin-top: 32px;">
+    <button id="save-rule-btn" style="padding: 12px 24px;">Save Rule</button>
+  </div>
 
   <script src="popup.js"></script>
 </body>

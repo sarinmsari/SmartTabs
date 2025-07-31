@@ -1,74 +1,125 @@
-const rulesContainer = document.getElementById('rulesContainer');
-const groupColors = ["grey", "blue", "red", "yellow", "green", "pink", "purple", "cyan", "orange"];
+//const rulesContainer = document.getElementById('rulesContainer');
+const groupColors = [
+  {ket:"grey",code:"#9E9E9E"},
+  {ket:"blue", code:"#2196F3"},
+  {ket:"red", code:"#F44336"},
+  {ket:"yellow", code:"#FFEB3B"},
+  {ket:"green", code:"#4CAF50"},
+  {ket:"pink", code:"#E91E63"},
+  {ket:"purple", code:"#9C27B0"},
+  {ket:"cyan", code:"#00BCD4"},
+  {ket:"orange", code:"#FF9800"}
+];
 
-function createRuleRow(domain = '', group = '', color = 'grey') {
-  const div = document.createElement('div');
-  div.className = 'rule-row';
-
-  const domainInput = document.createElement('input');
-  domainInput.placeholder = "domain.com";
-  domainInput.value = domain;
-
-  const groupInput = document.createElement('input');
-  groupInput.placeholder = "Group Name";
-  groupInput.value = group;
-
-  const colorSelect = document.createElement('select');
-  groupColors.forEach(c => {
-    const option = document.createElement('option');
-    option.value = c;
-    option.innerText = c;
-    if (c === color) option.selected = true;
-    colorSelect.appendChild(option);
-  });
-
-  div.appendChild(domainInput);
-  div.appendChild(groupInput);
-  div.appendChild(colorSelect);
-  rulesContainer.appendChild(div);
-}
-
-function loadRules() {
-  chrome.storage.sync.get('rules', (data) => {
-    rulesContainer.innerHTML = '';
-    const rules = data.rules || {};
-
-    for (const domain in rules) {
-      const value = rules[domain];
-      const group = typeof value === 'object' ? value.group : value;
-      const color = typeof value === 'object' ? value.color : 'grey';
-      createRuleRow(domain, group, color);
-    }
-  });
-}
-
-document.getElementById('addRule').addEventListener('click', () => {
-  createRuleRow();
-});
-
-document.getElementById('saveRules').addEventListener('click', () => {
-  const rows = rulesContainer.querySelectorAll('.rule-row');
-  const newRules = {};
-
-  rows.forEach(row => {
-    const inputs = row.querySelectorAll('input');
-    const select = row.querySelector('select');
-    const domain = inputs[0].value.trim();
-    const group = inputs[1].value.trim();
-    const color = select.value;
-
-    if (domain && group) {
-      newRules[domain] = { group, color };
+document.addEventListener('DOMContentLoaded', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    if (tabs.length > 0) {
+      const url = new URL(tabs[0].url);
+      document.getElementById('domainInput').value = url.hostname.replace(/^www\./, '');
     }
   });
 
-  chrome.storage.sync.set({ rules: newRules }, () => {
-    alert('✅ Rules saved!');
+  const groupSelect = document.getElementById('groupSelect');
+
+  chrome.storage.sync.get('availableGroups', (data) => {
+    const groupsObj = data.availableGroups || {};
+
+    if (Object.keys(groupsObj).length === 0) {
+      document.getElementsByClassName('group-select-wrapper')[0].style.display = 'none';
+      return;
+    }
+    
+    // Remove any old options (except the first one: "Create new group")
+    while (groupSelect.options.length > 1) {
+      groupSelect.remove(1);
+    }
+    // Add new options from availableGroups (keys as group names)
+    Object.entries(groupsObj).forEach(([groupName, groupData]) => {
+      const option = document.createElement('option');
+      option.value = groupName;
+      option.textContent = groupName;
+      option.setAttribute('data-color', groupData.color || 'grey');
+      option.setAttribute('data-groupid', groupData.groupId || '');
+      groupSelect.appendChild(option);
+    });
   });
 });
 
-document.getElementById('groupNow').addEventListener('click', () => {
+document.getElementById('groupSelect').addEventListener('change', (event) => {
+  const selectedValue = event.target.value;
+  if (selectedValue === 'create-group') {
+    document.getElementsByClassName('create-group-wrapper')[0].style.opacity = '1';
+    document.getElementById('groupColorSelect').value = 'grey'; // Default color
+    updateInputBorders('#9E9E9E'); // Default border color
+    document.getElementById('newGroupInput').value = ''; // Clear new group input
+  } else {
+    // Get assigned color for selected group
+    const group = selectedValue;
+    const colorCode = document.querySelector(`#groupSelect option[value="${group}"]`).getAttribute('data-color') || 'grey';
+    document.getElementsByClassName('create-group-wrapper')[0].style.opacity = '0';
+    updateInputBorders(colorCode);
+  }
+});
+
+document.getElementById('groupColorSelect').addEventListener('change', (event) => {
+  const selectedColor = event.target.value;
+  const colorCode = groupColors.find(c => c.ket === selectedColor)?.code || '#9E9E9E'; // Default to grey if not found
+  updateInputBorders(colorCode);
+});
+
+function updateInputBorders(colorCode) {
+  const domainInputElem = document.getElementById('domainInput');
+  if (domainInputElem) domainInputElem.style.borderColor = colorCode;
+
+  const groupSelectElem = document.getElementById('groupSelect');
+  if (groupSelectElem) groupSelectElem.style.borderColor = colorCode;
+
+  const groupColorSelectElem = document.getElementById('groupColorSelect');
+  if (groupColorSelectElem) groupColorSelectElem.style.borderColor = colorCode;
+
+  const newGroupInputElem = document.getElementById('newGroupInput');
+  if (newGroupInputElem) newGroupInputElem.style.borderColor = colorCode;
+}
+
+function groupTabs() {
+  // Close the popup and perform grouping
   chrome.runtime.sendMessage({ action: "groupTabs" });
-});
+  window.close();
+}
 
-loadRules();
+document.getElementById('save-rule-btn').addEventListener('click', () => {
+  const domain = document.getElementById('domainInput').value.trim();
+  const group = document.getElementById('groupSelect').value;
+  const color = document.getElementById('groupColorSelect').value;
+  const newGroupName = document.getElementById('newGroupInput').value.trim();
+
+  if (domain && group && group !== 'create-group') {
+    const rule = { group: newGroupName || group, color };
+    chrome.storage.sync.get('rules', (data) => {
+      const rules = data.rules || {};
+      rules[domain] = rule;
+      chrome.storage.sync.set({ rules }, () => {
+        console.log('✅ Rule saved!');
+        //loadRules();
+        groupTabs();
+      });
+    });
+  } else if (domain && group === 'create-group') {
+    if (newGroupName) {
+      const rule = { group: newGroupName, color };
+      chrome.storage.sync.get('rules', (data) => {
+        const rules = data.rules || {};
+        rules[domain] = rule;
+        chrome.storage.sync.set({ rules }, () => {
+          console.log('✅ Rule saved!');
+          //loadRules();
+          groupTabs();
+        });
+      });
+    } else {
+      alert('Please enter a group name.');
+    }
+  } else {
+    alert('Please enter a valid domain and select a group.');
+  }
+});

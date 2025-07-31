@@ -1,48 +1,77 @@
 body {
   font-family: sans-serif;
-  padding: 10px;
-  width: 300px;
-}
-
-input, select {
-  margin-bottom: 8px;
-  width: 100%;
-  padding: 6px;
+  padding: 18px;
+  width: 380px;
+  font-size: 14px;
+  background-color: #333;
+  color: #dddddd;
 }
 
 button {
-  width: 100%;
   padding: 8px;
   background-color: #1976d2;
   color: white;
   border: none;
   cursor: pointer;
-  margin-top: 8px;
+  border-radius: 12px;
+  font-size: 16px;
 }
 
-.rule {
-  margin-bottom: 12px;
+button:hover {
+  background-color: #1565c0;
 }
 
-.rule input {
-  width: 45%;
-  margin-right: 5%;
+.text-btn {
+  cursor: pointer;
+  color: #1d4ed8;
+  font-weight: 500;
 }
 
-.rule select {
-  width: 45%;
-}
-
-.rule-row {
+.input-wrapper {
   display: flex;
-  gap: 5px;
+  flex-direction: column;
+  margin-bottom: 12px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.input-box{
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background-color: #333;
+  color: #dddddd;
+}
+
+.select-box{
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  background-color: #333;
+  color: #dddddd;
+}
+
+.create-group-input-wrapper{
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.save-wrapper{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 18px;
+}
+
+label{
+  font-weight: 600;
   margin-bottom: 8px;
-}
-
-.rule-row input {
-  flex: 1;
-}
-
-.rule-row select {
-  flex: 1;
 }
