@@ -1,15 +1,19 @@
 //const rulesContainer = document.getElementById('rulesContainer');
 const groupColors = [
-  {ket:"grey",code:"#9E9E9E"},
-  {ket:"blue", code:"#2196F3"},
-  {ket:"red", code:"#F44336"},
-  {ket:"yellow", code:"#FFEB3B"},
-  {ket:"green", code:"#4CAF50"},
-  {ket:"pink", code:"#E91E63"},
-  {ket:"purple", code:"#9C27B0"},
-  {ket:"cyan", code:"#00BCD4"},
-  {ket:"orange", code:"#FF9800"}
+  {ket:"grey",code:"#D3D3D3"},
+  {ket:"blue", code:"#4A90E2"},
+  {ket:"red", code:"#E0564A"},
+  {ket:"yellow", code:"#E1AA46"},
+  {ket:"green", code:"#6CC164"},
+  {ket:"pink", code:"#E65FA2"},
+  {ket:"purple", code:"#A55CD7"},
+  {ket:"cyan", code:"#03DAC5"},
+  {ket:"orange", code:"#E67C3C"}
 ];
+
+document.getElementById('openOptions').addEventListener('click', () => {
+  chrome.runtime.openOptionsPage();
+});
 
 document.addEventListener('DOMContentLoaded', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
