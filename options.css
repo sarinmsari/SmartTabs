@@ -5,12 +5,13 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
+    background-color: #222222;
 }
 
 .group {
     width: 450px;
-    padding: 10px;
-    margin: 20px 0;
+    padding: 18px;
+    margin: 32px 0;
     border: 1px solid #ddd;
     border-radius: 8px;
     background-color: #fafafa;
@@ -18,10 +19,9 @@ body {
 
 .group-title {
     font-weight: bold;
-    margin-bottom: 5px;
     padding: 8px 12px;
     border-radius: 12px;
-    color: white;
+    color: #222222;
     width: fit-content;
     outline: none;
     border: none;
@@ -32,62 +32,62 @@ body {
     margin: 0;
 }
 
-.domain-item {
-    margin: 5px 0;
+.group-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.group-title-wrapper .group-edit-button {
+    flex-grow: 1;
+    background-color: #888888;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    margin: 0 10px;
+    opacity: 0.8;
+}
+
+.group-wrapper .group-delete-button {
+    background-color: #222222;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+.domain-item-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.domain-item-wrapper .domain-item {
+    flex-grow: 1;
+    border-radius: 8px;
+    margin: 6px 0;
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 4px;
     outline: none;
 }
 
-.group-title-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.group-title-wrapper .group-edit-button {
-    flex-grow: 1;
-    margin-right: 10px;
-    background-color: #888888;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 12px;
-    cursor: pointer;
-    margin-left: 10px;
-}
-
-.group-title-wrapper .group-delete-button {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 12px;
-    cursor: pointer;
-}
-
-.domain-item-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.domain-item-wrapper .domain-item {
-    flex-grow: 1;
-    border-radius: 12px;
-}
-
 .domain-item-wrapper .domain-edit-button {
     background: none;
     color: dark;
     border: none;
-    padding: 5px 10px;
     border-radius: 12px;
     cursor: pointer;
+    font-size: 12px;
 }
+
 .domain-item-wrapper .domain-delete-button {
-    background-color: #f44336;
+    background-color: #888888;
     color: white;
     border: none;
     border-radius: 50px;
@@ -97,6 +97,7 @@ body {
     font-size: 12px;
     opacity: 0.8;
 }
+
 .domain-delete-button{
     padding-bottom: 3px;
 }
@@ -110,5 +111,5 @@ input[readonly] {
 }
 
 .opacity-on-hover:hover {
-  opacity: 0.9;
+  opacity: 1;
 }

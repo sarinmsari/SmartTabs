@@ -165,17 +165,15 @@ function startGroupMonitorInterval() {
 
 // Handle group update events
 chrome.tabGroups.onUpdated.addListener((changeInfo) => {
-    if (!changeInfo || typeof changeInfo.id === 'undefined') return;
+    if (!(changeInfo || changeInfo.id)) return;
 
     const groupId = changeInfo.id;
-    if (!groupId || !groupActivityMap[groupId]) return;
 
     if ('collapsed' in changeInfo) {
         if (changeInfo.collapsed === false) { // on group expansion
-            currentActiveGroupId = groupId;
             groupActivityMap[groupId] = Date.now();
             startGroupMonitorInterval();
-        } else if (changeInfo.collapsed === true) { // on group collapse
+        } else { // on group collapse
             delete groupActivityMap[groupId];
             if (currentActiveGroupId === groupId) {
                 currentActiveGroupId = null;

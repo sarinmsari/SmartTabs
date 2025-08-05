@@ -19,7 +19,7 @@ async function renderGroups() {
 
         // Group header
         const titleDivWrapper = document.createElement('div');
-        titleDivWrapper.className = 'group-title-wrapper';
+        titleDivWrapper.className = 'group-wrapper';
 
         const titleDiv = document.createElement('div');
         titleDiv.className = 'group-title-wrapper';
@@ -81,7 +81,7 @@ async function renderGroups() {
         titleDiv.appendChild(editButton);
 
         const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Delete group';
+        deleteButton.textContent = 'Delete';
         deleteButton.className = 'group-delete-button';
         deleteButton.classList.add('opacity-on-hover');
         deleteButton.onclick = () => {
@@ -193,8 +193,8 @@ async function renderGroups() {
                     });
                 };
                 liWrapper.className = 'domain-item-wrapper';
-                liWrapper.appendChild(li);
                 liWrapper.appendChild(deleteButton);
+                liWrapper.appendChild(li);
                 domainList.appendChild(liWrapper);
                 hasDomains = true;
             }
