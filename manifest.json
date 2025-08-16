@@ -3,7 +3,7 @@
   "name": "Smart Auto Tab Grouper",
   "version": "1.0",
   "description": "Automatically groups tabs based on URL or domain.",
-  "permissions": ["tabs", "tabGroups", "storage"],
+  "permissions": ["tabs", "tabGroups", "storage", "alarms"],
   "background": {
     "service_worker": "background.js"
   },

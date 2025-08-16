@@ -43,6 +43,10 @@ function rebuildGroupMap() {
 // on extension initialization
 chrome.runtime.onInstalled.addListener(() => {
     console.log("✅ Smart Auto Tab Grouper installed");
+    chrome.alarms.create('autoCollapseCheck', {
+        periodInMinutes: 1  // Fires every 1 minute
+    });
+
     chrome.storage.sync.get('settings', (data) => {
         if (!data.settings) {
             // Initialize default settings if not present
@@ -64,6 +68,13 @@ chrome.runtime.onInstalled.addListener(() => {
     // Initialize storage with empty rules and available groups
     /* chrome.storage.sync.set({ rules: {} });
     chrome.storage.sync.set({ availableGroups: {} }); */
+});
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'autoCollapseCheck') {
+    startGroupMonitorInterval();
+    console.log('Auto-collapse check triggered!');
+  }
 });
 
 // track when user switches tabs
