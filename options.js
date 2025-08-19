@@ -1,3 +1,15 @@
+const groupColors = [
+  {key:"grey",code:"#D3D3D3"},
+  {key:"blue", code:"#4A90E2"},
+  {key:"red", code:"#E0564A"},
+  {key:"yellow", code:"#E1AA46"},
+  {key:"green", code:"#6CC164"},
+  {key:"pink", code:"#E65FA2"},
+  {key:"purple", code:"#A55CD7"},
+  {key:"cyan", code:"#03DAC5"},
+  {key:"orange", code:"#E67C3C"}
+];
+
 async function renderGroups() {
     const { availableGroups = {} } = await chrome.storage.sync.get('availableGroups');
     const { rules = {} } = await chrome.storage.sync.get('rules');
@@ -12,6 +24,8 @@ async function renderGroups() {
         container.textContent = 'No tab groups found.';
         return;
     }
+
+    const colours = ["grey", "red", "blue", "green", "yellow", "purple", "orange"];
 
     groupEntries.forEach(([groupTitle, groupData]) => {
         const groupDiv = document.createElement('div');
@@ -29,6 +43,43 @@ async function renderGroups() {
         titleInput.style.backgroundColor = groupData.colorCode || 'grey'; // Use group's color
         titleInput.readOnly = true; // Make it read-only
         titleInput.value = `${groupTitle}`;
+
+        const colourDropdown = document.createElement('select');
+        colourDropdown.className = 'group-color-dropdown';
+        colourDropdown.style.backgroundColor = groupData.colorCode || '#D3D3D3'; // Default color
+        colourDropdown.innerHTML = groupColors.map(
+            ({ key, code }) => `
+                <option value="${code}" style="background-color: ${code};"
+                    ${groupData.colorCode === code ? "selected" : ""}>
+                    ${key.charAt(0).toUpperCase() + key.slice(1)}
+                </option>
+            `
+        ).join("");
+
+        colourDropdown.value = groupData.colorCode || "#D3D3D3";
+        colourDropdown.onchange = () => {
+            const newColorCode = colourDropdown.value;
+            const newColor = colourDropdown.options[colourDropdown.selectedIndex].text.toLocaleLowerCase();
+            titleInput.style.backgroundColor = newColorCode;
+            colourDropdown.style.backgroundColor = newColorCode;
+
+            // Update the group color in storage
+            chrome.storage.sync.get('availableGroups', (data) => {
+                const updatedGroups = data.availableGroups || {};
+                if (updatedGroups[groupTitle]) {
+                    const groupDataCopy = {
+                        ...updatedGroups[groupTitle],
+                        colorCode: newColorCode,
+                        color: newColor
+                    };
+                    updatedGroups[groupTitle] = groupDataCopy;
+
+                    chrome.storage.sync.set({ availableGroups: updatedGroups }, () => {
+                        console.log(`Group color updated: ${groupTitle} to ${newColor}`);
+                    });
+                }
+            });
+        };
 
         const editButton = document.createElement('button');
         editButton.className = 'group-edit-button';
@@ -77,6 +128,7 @@ async function renderGroups() {
                 }
             };
         };
+        titleDiv.appendChild(colourDropdown);
         titleDiv.appendChild(titleInput);
         titleDiv.appendChild(editButton);
 

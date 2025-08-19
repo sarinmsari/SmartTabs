@@ -234,6 +234,7 @@ function ensureGroupByTitle(title, color, callback) {
 }
 
 /* __ BASICS __ */
+//TODO: update such that rules stores gropu id but no colour code, colour is stored in availableGroups
 // Group tab when updated
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (changeInfo.status === "complete" && tab.url && !tab.incognito) {
