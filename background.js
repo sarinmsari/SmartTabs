@@ -1,13 +1,13 @@
 const groupColors = [
-  {ket:"grey",code:"#D3D3D3"},
-  {ket:"blue", code:"#4A90E2"},
-  {ket:"red", code:"#E0564A"},
-  {ket:"yellow", code:"#E1AA46"},
-  {ket:"green", code:"#6CC164"},
-  {ket:"pink", code:"#E65FA2"},
-  {ket:"purple", code:"#A55CD7"},
-  {ket:"cyan", code:"#03DAC5"},
-  {ket:"orange", code:"#E67C3C"}
+  {key:"grey",code:"#D3D3D3"},
+  {key:"blue", code:"#4A90E2"},
+  {key:"red", code:"#E0564A"},
+  {key:"yellow", code:"#E1AA46"},
+  {key:"green", code:"#6CC164"},
+  {key:"pink", code:"#E65FA2"},
+  {key:"purple", code:"#A55CD7"},
+  {key:"cyan", code:"#03DAC5"},
+  {key:"orange", code:"#E67C3C"}
 ];
 
 const groupMap = {}; // { 'Social': groupId, ... }
@@ -279,7 +279,7 @@ function createNewGroup(tab, groupTitle, groupColor = "grey") {
         }
 
         // Find the color code from groupColors array
-        const colorObj = groupColors.find(c => c.ket === groupColor || c.code === groupColor);
+        const colorObj = groupColors.find(c => c.key === groupColor || c.code === groupColor);
         const colorCode = colorObj ? colorObj.code : "#D3D3D3"; // fallback to grey
 
         chrome.tabGroups.update(newGroupId, {
@@ -296,9 +296,9 @@ function createNewGroup(tab, groupTitle, groupColor = "grey") {
 
             // Persist group with color code
             chrome.storage.sync.get('availableGroups', (data) => {
-            const availableGroups = data.availableGroups || {};
-            availableGroups[groupTitle] = { groupId: newGroupId, color: groupColor, colorCode };
-            chrome.storage.sync.set({ availableGroups });
+                const availableGroups = data.availableGroups || {};
+                availableGroups[groupTitle] = { groupId: newGroupId, color: groupColor, colorCode };
+                chrome.storage.sync.set({ availableGroups });
             });
         });
     });

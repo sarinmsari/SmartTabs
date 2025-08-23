@@ -63,7 +63,18 @@ async function renderGroups() {
             titleInput.style.backgroundColor = newColorCode;
             colourDropdown.style.backgroundColor = newColorCode;
 
-            // Update the group color in storage
+            // Update the group color in rules
+            for (const [domain, rule] of Object.entries(rules)) {
+                if (rule.group === groupTitle) {
+                    const updatedRule = { ...rule, color: newColor };
+                    rules[domain] = updatedRule;
+                }
+            }
+            chrome.storage.sync.set({ rules }, () => {
+                console.log(`Rules updated with new color for group ${groupTitle}`);
+            });
+
+            //update the color in availableGroups
             chrome.storage.sync.get('availableGroups', (data) => {
                 const updatedGroups = data.availableGroups || {};
                 if (updatedGroups[groupTitle]) {
@@ -79,19 +90,28 @@ async function renderGroups() {
                     });
                 }
             });
+
+            // Update the color of all tabs in this group
+            chrome.tabs.query({}, (tabs) => {
+                tabs.forEach((tab) => {
+                    if (tab.groupId === groupData.groupId) {
+                        chrome.tabGroups.update(tab.groupId, { color: newColor });
+                    }
+                });
+            });
         };
 
         const editButton = document.createElement('button');
         editButton.className = 'group-edit-button';
         editButton.classList.add('opacity-on-hover');
-        editButton.textContent = 'Edit';
+        editButton.textContent = 'Edit title';
         editButton.onclick = () => {
             titleInput.readOnly = false; // Make it editable
             titleInput.focus();
             editButton.textContent = 'Save';
             editButton.onclick = () => {
                 titleInput.readOnly = true; // Make it read-only again
-                editButton.textContent = 'Edit';
+                editButton.textContent = 'Edit title';
                 // Save the updated group title
                 const updatedGroupTitle = titleInput.value.trim();
                 if (updatedGroupTitle) {
@@ -163,6 +183,16 @@ async function renderGroups() {
                     });
                 }
             });
+
+            // Update the color of all tabs in this group
+            chrome.tabs.query({}, (tabs) => {
+                tabs.forEach((tab) => {
+                    if (tab.groupId === groupData.groupId) {
+                        chrome.tabs.ungroup(tab.id);
+                    }
+                });
+            });
+
         };
         
         titleDivWrapper.appendChild(titleDiv);
@@ -242,6 +272,26 @@ async function renderGroups() {
                                 liWrapper.remove(); // Remove the list item from the UI
                             });
                         }
+                    });
+
+                    // Update the color of all tabs in this group
+                    chrome.tabs.query({}, (tabs) => {
+                        tabs.forEach((tab) => {
+                            try {
+                                const url = new URL(tab.url || "");
+                                if (url.hostname === domain) {
+                                    chrome.tabs.ungroup(tab.id, () => {
+                                        if (chrome.runtime.lastError) {
+                                            console.error(chrome.runtime.lastError);
+                                        } else {
+                                            console.log(`Ungrouped tab ${tab.id} with domain ${domain}`);
+                                        }
+                                    });
+                                }
+                            } catch (e) {
+                                // Ignore tabs without valid URLs (like chrome:// or about:blank)
+                            }
+                        });
                     });
                 };
                 liWrapper.className = 'domain-item-wrapper';

@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Smart Auto Tab Grouper",
-  "version": "1.0",
-  "description": "Automatically groups tabs based on URL or domain.",
+  "name": "Auto Tab Grouping by Domain – Organize Chrome Tabs",
+  "version": "1.1",
+  "description": "Automatically groups your Chrome tabs by url. Keep your browser clean, organized, and productive with smart tab management.",
   "permissions": ["tabs", "tabGroups", "storage", "alarms"],
   "background": {
     "service_worker": "background.js"
