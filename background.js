@@ -14,8 +14,16 @@ const groupMap = {}; // { 'Social': groupId, ... }
 const groupActivityMap = {}; // { groupId: lastActiveTimestamp }
 let currentActiveGroupId = null;
 let currentActiveTabId = null;
-let IDLE_TIME_MS;
+let IDLE_TIME_MS = 30000;
+let intervalId = null;
 const INTERVAL_TIME_MS = 1000 * 1; // 1 seconds
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === 'autoCollapseCheck') {
+    startGroupMonitorInterval();
+    console.log('Auto-collapse check triggered!');
+  }
+});
 
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area === "sync" && changes.settings?.newValue) {
@@ -26,6 +34,9 @@ chrome.storage.onChanged.addListener((changes, area) => {
 
 chrome.runtime.onStartup?.addListener(() => {
     rebuildGroupMap();
+    chrome.alarms.create('autoCollapseCheck', {
+        periodInMinutes: 1  // Fires every 1 minute
+    });
 });
 
 function rebuildGroupMap() {
@@ -70,13 +81,6 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.storage.sync.set({ availableGroups: {} }); */
 });
 
-chrome.alarms.onAlarm.addListener((alarm) => {
-  if (alarm.name === 'autoCollapseCheck') {
-    startGroupMonitorInterval();
-    console.log('Auto-collapse check triggered!');
-  }
-});
-
 // track when user switches tabs
 chrome.tabs.onActivated.addListener(async ({ tabId }) => {
     try {
@@ -111,12 +115,12 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 });
 
 // periodic check to collapse inactive groups
-let intervalId = null;
-
-function startGroupMonitorInterval() {
+chrome.storage.sync.set({ hasAutoCollapse: 1 })
+const startGroupMonitorInterval = () => {
     if (intervalId !== null) return; // already running
 
     intervalId = setInterval(() => {
+        chrome.storage.sync.get('hasAutoCollapse');
         const now = Date.now();
 
         const groupIds = Object.keys(groupActivityMap);
@@ -136,7 +140,6 @@ function startGroupMonitorInterval() {
             const lastActivity = groupActivityMap[groupId];
             const inactiveTime = now - lastActivity;
 
-            // Example: collapse group after 60s of inactivity
             if (inactiveTime > IDLE_TIME_MS) {
                 const parsedGroupId = parseInt(groupId);
 
