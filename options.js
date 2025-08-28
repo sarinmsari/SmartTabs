@@ -21,7 +21,10 @@ async function renderGroups() {
     const groupEntries = Object.entries(availableGroups);
 
     if (groupEntries.length === 0) {
-        container.textContent = 'No tab groups found.';
+        const noGroupElem = document.createElement('div');
+        noGroupElem.className = 'noGroupElem'
+        noGroupElem.textContent = 'No tab groups found!';
+        container.appendChild(noGroupElem);
         return;
     }
 

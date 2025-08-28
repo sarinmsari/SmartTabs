@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Auto Tab Grouping by Domain – Organize Chrome Tabs",
-  "version": "1.2",
+  "version": "1.2.1",
   "description": "Automatically groups your Chrome tabs by url. Keep your browser clean, organized, and productive with smart tab management.",
   "permissions": ["tabs", "tabGroups", "storage", "alarms"],
   "background": {

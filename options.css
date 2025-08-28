@@ -8,6 +8,12 @@ body {
     background-color: #222222;
 }
 
+.noGroupElem{
+    color: white;
+    font-size: 16px;
+    margin-top: 24px;
+}
+
 .group {
     width: 450px;
     padding: 18px;
@@ -124,4 +130,24 @@ input[readonly] {
     border: none;
     border-right: 1px solid #dddddd;
     height: 30px;
+}
+
+.footer-section{
+    position: fixed;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 16px 0px;
+    font-size: 16px;
+}
+
+.footer-item {
+    margin-left: 16px;
+    color: #777777;
+    text-decoration: none;
+}
+
+.footer-item:hover {
+    color: #999999;
 }
