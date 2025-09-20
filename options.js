@@ -10,6 +10,34 @@ const groupColors = [
   {key:"orange", code:"#E67C3C"}
 ];
 
+const getSettings = (callback) => {
+  chrome.storage.sync.get('settings', (data) => {
+    const settings = data.settings || {};
+    callback(settings);
+  });
+};
+
+const initializeSettings = async() => {
+    console.log("Initializing settings...");
+    getSettings((settings) => {
+        console.log("Current settings:", JSON.stringify(settings, null, 2));
+        if (!settings || Object.keys(settings).length === 0) {
+            // Initialize default settings if not present
+            const defaultSettings = {
+                autoGroup: true,
+                autoCollapse: false,
+                autoCollapseTime: 60, // in seconds
+            }
+            chrome.storage.sync.set({ settings: defaultSettings }, () => {
+                console.log("Default settings initialized:", defaultSettings);
+            });
+        }else{
+            const autocollapseToggle = document.getElementById('autocollapseToggle');
+            autocollapseToggle.checked = settings.autoCollapse || false;
+        }
+    });
+};
+
 async function renderGroups() {
     const { availableGroups = {} } = await chrome.storage.sync.get('availableGroups');
     const { rules = {} } = await chrome.storage.sync.get('rules');
@@ -316,4 +344,17 @@ async function renderGroups() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', renderGroups);
+document.addEventListener('DOMContentLoaded', async() => {
+    initializeSettings();
+    renderGroups();
+    
+    const autocollapseToggle = document.getElementById('autocollapseToggle');
+    autocollapseToggle.onchange = () => {
+        getSettings((settings) => {
+            const newSettings = { ...settings, autoCollapse: autocollapseToggle.checked };
+            chrome.storage.sync.set({ settings: newSettings }, () => {
+                console.log('Auto-collapse setting updated:', newSettings.autoCollapse);
+            });
+        });
+    };
+});

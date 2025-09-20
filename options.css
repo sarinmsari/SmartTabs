@@ -151,3 +151,22 @@ input[readonly] {
 .footer-item:hover {
     color: #999999;
 }
+
+.settings-item {
+    margin: 16px 0;
+    font-size: 14px;
+    color: #dddddd;
+    background-color: #555555;
+}
+
+.settings-item label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+#autocollapseToggle {
+    transform: scale(1.2);
+    margin-right: 8px;
+    cursor: pointer;
+}

@@ -17,6 +17,41 @@ let currentActiveTabId = null;
 let IDLE_TIME_MS = 30000;
 let intervalId = null;
 const INTERVAL_TIME_MS = 1000 * 1; // 1 seconds
+let extensionSettings = {};
+
+//utility functions
+
+const getSettings = (callback) => {
+  chrome.storage.sync.get('settings', (data) => {
+    const settings = data.settings || {};
+    callback(settings);
+  });
+};
+
+const initializeSettings = () => {
+    getSettings((settings) => {
+        if (!settings || Object.keys(settings).length === 0) {
+            // Initialize default settings if not present
+            const defaultSettings = {
+                autoGroup: true,
+                autoCollapse: false,
+                autoCollapseTime: 60, // in seconds
+            }
+            chrome.storage.sync.set({ settings: defaultSettings }, () => {
+                IDLE_TIME_MS = defaultSettings.autoCollapseTime * 1000; // convert to milliseconds
+                extensionSettings = defaultSettings;
+                console.log("Default settings initialized:", defaultSettings);
+            });
+        }else{
+            extensionSettings = settings;
+            if (extensionSettings.autoCollapseTime) {
+                IDLE_TIME_MS = extensionSettings.autoCollapseTime * 1000; // convert to milliseconds
+            }
+        }
+    });
+};
+
+// .. urility functions end
 
 chrome.alarms.onAlarm.addListener((alarm) => {
   if (alarm.name === 'autoCollapseCheck') {
@@ -33,6 +68,7 @@ chrome.storage.onChanged.addListener((changes, area) => {
 });
 
 chrome.runtime.onStartup?.addListener(() => {
+    initializeSettings();
     rebuildGroupMap();
     chrome.alarms.create('autoCollapseCheck', {
         periodInMinutes: 1  // Fires every 1 minute
@@ -58,23 +94,7 @@ chrome.runtime.onInstalled.addListener(() => {
         periodInMinutes: 1  // Fires every 1 minute
     });
 
-    chrome.storage.sync.get('settings', (data) => {
-        if (!data.settings) {
-            // Initialize default settings if not present
-            const defaultSettings = {
-                autoGroup: true,
-                autoCollapse: true,
-                autoCollapseTime: 30, // in seconds
-            }
-            chrome.storage.sync.set({ settings: defaultSettings }, () => {
-                IDLE_TIME_MS = defaultSettings.autoCollapseTime * 1000; // convert to milliseconds
-                console.log("Default settings initialized:", defaultSettings);
-            });
-        } else {
-            IDLE_TIME_MS = data.settings.autoCollapseTime * 1000; // convert to milliseconds
-            console.log("Settings already initialized:", data.settings);
-        }
-    });
+    initializeSettings();
     
     // Initialize storage with empty rules and available groups
     /* chrome.storage.sync.set({ rules: {} });
@@ -117,6 +137,17 @@ chrome.tabs.onActivated.addListener(async ({ tabId }) => {
 // periodic check to collapse inactive groups
 chrome.storage.sync.set({ hasAutoCollapse: 1 })
 const startGroupMonitorInterval = () => {
+    getSettings((settings) => {
+        extensionSettings = settings;
+        if (!extensionSettings?.autoCollapse){
+            if (intervalId !== null) {
+                clearInterval(intervalId);
+                intervalId = null;
+                console.log("Auto-collapse disabled, stopping monitor.");
+            }
+            return;
+        }
+    });
     if (intervalId !== null) return; // already running
 
     intervalId = setInterval(() => {

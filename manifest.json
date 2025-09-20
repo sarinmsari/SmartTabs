@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Auto Tab Grouping by Domain – Organize Chrome Tabs",
+  "name": "TabFlow - Auto Tab Grouping",
   "version": "1.2.1",
-  "description": "Automatically groups your Chrome tabs by url. Keep your browser clean, organized, and productive with smart tab management.",
+  "description": "TabFlow automatically organizes Chrome tabs into groups. Keep your browser clean, reduce tab clutter, and boost productivity with smart tab management. Perfect for heavy tab users who want a faster, smoother browsing experience.",
   "permissions": ["tabs", "tabGroups", "storage", "alarms"],
   "background": {
     "service_worker": "background.js"
