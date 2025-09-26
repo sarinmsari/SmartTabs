@@ -137,10 +137,11 @@ async function renderGroups() {
         editButton.classList.add('opacity-on-hover');
         editButton.textContent = 'Edit title';
         editButton.onclick = () => {
-            titleInput.readOnly = false; // Make it editable
-            titleInput.focus();
-            editButton.textContent = 'Save';
-            editButton.onclick = () => {
+            if (editButton.textContent.toLowerCase() === 'edit title') {
+                titleInput.readOnly = false; // Make it editable
+                titleInput.focus();
+                editButton.textContent = 'Save';
+            }else{
                 titleInput.readOnly = true; // Make it read-only again
                 editButton.textContent = 'Edit title';
                 // Save the updated group title
@@ -253,10 +254,11 @@ async function renderGroups() {
                 editButton.className = 'domain-edit-button';
                 editButton.classList.add('underline-on-hover');
                 editButton.onclick = () => {
-                    liInput.readOnly = false; // Make it editable
-                    liInput.focus();
-                    editButton.textContent = 'Save';
-                    editButton.onclick = () => {
+                    if (editButton.textContent.toLowerCase() === 'edit') {
+                        liInput.readOnly = false; // Make it editable
+                        liInput.focus();
+                        editButton.textContent = 'Save';
+                    }else{
                         liInput.readOnly = true; // Make it read-only again
                         editButton.textContent = 'Edit';
                         // Save the updated domain

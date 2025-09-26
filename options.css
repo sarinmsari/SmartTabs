@@ -170,3 +170,8 @@ input[readonly] {
     margin-right: 8px;
     cursor: pointer;
 }
+
+.right-bar{
+    padding-right: 16px;
+    border-right: 1px solid #777777;
+}
