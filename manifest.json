@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "TabFlow - Auto Tab Grouping",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "description": "TabFlow auto-organizes Chrome tabs into groups. Declutter your browser, cut tab chaos, and boost focus with smart tab management.",
   "permissions": ["tabs", "tabGroups", "storage", "alarms"],
   "background": {

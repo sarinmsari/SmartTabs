@@ -1,29 +1,32 @@
 body {
   font-family: sans-serif;
   padding: 18px;
-  width: 380px;
+  width: 280px;
   font-size: 14px;
-  background-color: #333;
-  color: #dddddd;
+  background-color: #F5F5F5;
+  color: #222222;
 }
 
 button {
   padding: 8px;
-  background-color: #1976d2;
+  background-color: #283739;
   color: white;
   border: none;
   cursor: pointer;
   border-radius: 12px;
   font-size: 16px;
+  transform: translate();
+  transition-duration: 150ms;
+  transition-timing-function: ease-in-out;
 }
 
 button:hover {
-  background-color: #1565c0;
+  background-color: #228896;
 }
 
 .text-btn {
   cursor: pointer;
-  color: #1d4ed8;
+  color: #283739;
   font-weight: 500;
 }
 
@@ -42,8 +45,8 @@ button:hover {
   border-radius: 8px;
   font-size: 14px;
   outline: none;
-  background-color: #333;
-  color: #dddddd;
+  background-color: #F5F5F5;
+  color: #222222;
 }
 
 .select-box{
@@ -53,8 +56,8 @@ button:hover {
   border-radius: 8px;
   font-size: 14px;
   outline: none;
-  background-color: #333;
-  color: #dddddd;
+  background-color: #F5F5F5;
+  color: #222222;
 }
 
 .create-group-input-wrapper{
